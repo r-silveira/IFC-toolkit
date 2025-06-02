@@ -26,9 +26,26 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ara3D.IfcLoader\Ara3D.IfcLoader.csproj" />
-    <ProjectReference Include="..\Ara3D.IfcParser\Ara3D.IfcParser.csproj" />
     <ProjectReference Include="..\Ara3D.Speckle.Data\Ara3D.Speckle.Data.csproj" />
     <ProjectReference Include="..\Ara3D.Speckle.IfcLoader\Ara3D.Speckle.IfcLoader.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Ara3D.IO.IfcParser">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.IO.IfcParser.dll</HintPath>
+    </Reference>
+    <Reference Include="Ara3D.IO.StepParser">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.IO.StepParser.dll</HintPath>
+    </Reference>
+    <Reference Include="Ara3D.Logging">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Ara3D.Memory">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Ara3D.Utils">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Utils.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

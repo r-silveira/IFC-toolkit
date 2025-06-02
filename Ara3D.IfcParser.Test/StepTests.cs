@@ -1,6 +1,6 @@
-using Ara3D.Buffers;
+//using Ara3D.IO.Buffers;
 using Ara3D.Logging;
-using Ara3D.StepParser;
+using Ara3D.IO.StepParser;
 using Ara3D.Utils;
 using GeometryGym.Ifc;
 using IFC;
@@ -16,20 +16,20 @@ public static class StepTests
 {
     public static IReadOnlyList<FilePath> Files => Config.Files;
 
-    public static IEnumerable<StepRawInstance> GetInstances(StepDocument doc, ByteSpan type) =>
-        doc.RawInstances.Where(inst
-            => inst.Type.Equals(type));
+    //public static IEnumerable<StepRawInstance> GetInstances(StepDocument doc, ByteSpan type) =>
+    //    doc.RawInstances.Where(inst
+    //        => inst.Type.Equals(type));
 
-    public static IEnumerable<StepRawInstance> GetInstances(StepDocument doc, string type) =>
-        type.WithSpan(span =>
-            doc.RawInstances.Where(inst =>
-                inst.Type.Equals(span)));
+    //public static IEnumerable<StepRawInstance> GetInstances(StepDocument doc, string type) =>
+    //    type.WithSpan(span =>
+    //        doc.RawInstances.Where(inst =>
+    //            inst.Type.Equals(span)));
 
-    public static void Ara3DListDoors(StepDocument doc, ILogger logger)
-    {
-        var doors = GetInstances(doc, "IFCDOOR").ToList();
-        Console.WriteLine($"Found {doors.Count} doors in {doc.FilePath}");
-    }
+    //public static void Ara3DListDoors(StepDocument doc, ILogger logger)
+    //{
+    //    var doors = GetInstances(doc, "IFCDOOR").ToList();
+    //    Console.WriteLine($"Found {doors.Count} doors in {doc.FilePath}");
+    //}
 
     public static void XBimListDoors(IfcStore store, ILogger logger)
     {
@@ -95,7 +95,7 @@ public static class StepTests
         var doc = new StepDocument(filePath, logger);
         //VisitRecords(doc, logger);
         //ListEntityTypes(doc, logger);
-        Ara3DListDoors(doc, logger);
+        //Ara3DListDoors(doc, logger);
         logger.Log("Disposing");
         doc.Dispose();
     }

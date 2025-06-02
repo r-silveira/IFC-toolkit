@@ -1,7 +1,7 @@
 using System.Drawing;
 using System.Reflection;
 using Ara3D.IfcLoader;
-using Ara3D.IfcParser;
+using Ara3D.IO.IfcParser;
 using Ara3D.Utils;
 using Objects.Geometry;
 using Objects.Other;

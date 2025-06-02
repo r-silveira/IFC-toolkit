@@ -7,8 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="Ara3D.IO.IfcParser">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.IO.IfcParser.dll</HintPath>
+    </Reference>
+    <Reference Include="Ara3D.IO.StepParser">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.IO.StepParser.dll</HintPath>
+    </Reference>
+    <Reference Include="Ara3D.Logging">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Ara3D.Memory">
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="Ara3D.Utils">
-      <HintPath>..\..\Utils\Ara3D.Utils\bin\Debug\netstandard2.0\Ara3D.Utils.dll</HintPath>
+      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Utils.dll</HintPath>
     </Reference>
   </ItemGroup>
 

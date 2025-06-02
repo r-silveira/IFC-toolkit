@@ -93,7 +93,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>_deps\tinynurbs-src\include;_deps\fastfloat-src\include;_deps\cdt-src\CDT\include;_deps\glm-src;_deps\glm-src\glm;_deps\earcut-src\include;_deps\fuzzy-src;_deps\spdlog-src\include;_deps\tinycpptest-src\Sources;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>_deps\tinynurbs-src\include;_deps\fastfloat-src\include;_deps\cdt-src\CDT\include;_deps\glm-src;_deps\glm-src\glm;_deps\earcut-src\include;_deps\fuzzy-src;_deps\spdlog-src\include;_deps\tinycpptest-src\Sources;_deps\stduuid-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -105,7 +105,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CMAKE_INTDIR="Debug";SPDLOG_NO_TLS;_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS;GLM_ENABLE_EXPERIMENTAL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CMAKE_INTDIR="Debug";SPDLOG_NO_TLS;_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <AdditionalOptions> /bigobj /utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -137,7 +137,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>_deps\tinynurbs-src\include;_deps\fastfloat-src\include;_deps\cdt-src\CDT\include;_deps\glm-src;_deps\glm-src\glm;_deps\earcut-src\include;_deps\fuzzy-src;_deps\spdlog-src\include;_deps\tinycpptest-src\Sources;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>_deps\tinynurbs-src\include;_deps\fastfloat-src\include;_deps\cdt-src\CDT\include;_deps\glm-src;_deps\glm-src\glm;_deps\earcut-src\include;_deps\fuzzy-src;_deps\spdlog-src\include;_deps\tinycpptest-src\Sources;_deps\stduuid-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Async</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -147,7 +147,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";GLM_ENABLE_EXPERIMENTAL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
@@ -265,21 +265,36 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\engine_web-ifc\src\cpp\geometry\IfcGeometryLoader.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\modelmanager\ModelManager.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\schema\IfcSchemaManager.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\schema\schema-functions.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\parsing\IfcFileStream.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\parsing\IfcLoader.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\parsing\IfcTokenChunk.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\parsing\IfcTokenStream.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\parsing\string_parsing.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\geometry\IfcGeometryProcessor.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\geometry\nurbs.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\geometry\representation\IfcCurve.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\geometry\representation\IfcGeometry.cpp" />
-    <ClCompile Include="..\engine_web-ifc\src\cpp\test\encoding_test.cpp" />
     <ClCompile Include="..\engine_web-ifc\src\cpp\test\io_helpers.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\test\web-ifc-test.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\IfcGeometryLoader.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\IfcGeometryProcessor.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\nurbs.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\aabb.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\alignment.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\arc.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\buffers.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\circularSweep.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\clothoid.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\curve.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\cylindricalRevolution.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\extrusion.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\face.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\geometry.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\parabola.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\revolution.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\operations\bim-geometry\sweep.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\representation\IfcCurve.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\geometry\representation\IfcGeometry.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\modelmanager\ModelManager.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\parsing\IfcFileStream.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\parsing\IfcLoader.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\parsing\IfcTokenChunk.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\parsing\IfcTokenStream.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\parsing\string_parsing.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\parsing\uuid_utils.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\schema\IfcSchemaManager.cpp" />
+    <ClCompile Include="..\engine_web-ifc\src\cpp\web-ifc\schema\schema-functions.cpp" />
     <ClCompile Include="Api.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

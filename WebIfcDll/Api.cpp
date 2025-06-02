@@ -16,7 +16,7 @@
 #include <stack>
 #include <cstdint>
 #include <memory>
-#include "../engine_web-ifc/src/cpp/modelmanager/ModelManager.h"
+#include "../engine_web-ifc/src/cpp/web-ifc/modelmanager/ModelManager.h"
 #include "../engine_web-ifc/src/cpp/version.h"
 #include <iostream>
 #include <fstream>

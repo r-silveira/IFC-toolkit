@@ -53,6 +53,7 @@ extern "C"
     __declspec(dllexport) int GetNumIndices(Api* api, Mesh* mesh);
     __declspec(dllexport) uint32_t* GetIndices(Api* api, Mesh* mesh);
 	__declspec(dllexport) const char* GetGuid(const Model* model, const ::Geometry* geom);
+	__declspec(dllexport) const char* GetEntityType(const Model* model, const ::Geometry* geom);
 	__declspec(dllexport) void FreeString(const char* str);
 }
 
@@ -99,21 +100,23 @@ struct Model
     uint32_t id;
     IfcLoader* loader;
     IfcGeometryProcessor* geometryProcessor;
+	IfcSchemaManager* schemaManager;
     std::vector<::Geometry*> geometryList;
     std::unordered_map<uint32_t, ::Geometry*> geometries;
 
     Model(IfcSchemaManager* schemas, IfcLoader* loader, IfcGeometryProcessor* processor, uint32_t id)
         : loader(loader), geometryProcessor(processor), id(id)
     {
+		schemaManager = schemas;
         for (auto type : schemas->GetIfcElementList())
         {
             // TODO: maybe some of these elments are desired. In fact, I think there may be explicit requests for IFCSPACE?
-            if (type == IFCOPENINGELEMENT
+            /*if (type == IFCOPENINGELEMENT
                 || type == IFCSPACE
                 || type == IFCOPENINGSTANDARDCASE)
             {
                 continue;
-            }
+            }*/
 
             for (auto eId : loader->GetExpressIDsWithType(type))
             {
@@ -165,6 +168,32 @@ struct Model
 		if (result)
 		{
 			std::memcpy(result, guid.c_str(), guid.size() + 1);
+		}
+
+		return result;
+	}
+
+	const char* GetEntityType(const ::Geometry* geom) const
+	{
+		if (schemaManager == nullptr)
+		{
+			return nullptr;
+		}
+
+		const int geoExpressId = geom->id;
+
+		uint32_t lineType = loader->GetLineType(geoExpressId);
+		if (lineType == 0)
+		{
+			return nullptr;
+		}
+
+		const std::string& ifcProduct = schemaManager->IfcTypeCodeToType(lineType);
+		auto result = (char*)malloc(ifcProduct.size() + 1);
+
+		if (result)
+		{
+			std::memcpy(result, ifcProduct.c_str(), ifcProduct.size() + 1);
 		}
 
 		return result;
@@ -269,6 +298,11 @@ uint32_t* GetIndices(Api* api, Mesh* mesh) {
 const char* GetGuid(const Model* model, const ::Geometry* geom)
 {
 	return model->GetGuid(geom);
+}
+
+const char* GetEntityType(const Model* model, const ::Geometry* geom)
+{
+	return model->GetEntityType(geom);
 }
 
 void FreeString(const char* str)

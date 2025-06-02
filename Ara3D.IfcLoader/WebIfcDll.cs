@@ -75,7 +75,11 @@ namespace Ara3D.IfcLoader
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern IntPtr GetGuid(IntPtr model, IntPtr geometry);
 
-        // FreeStringAdd commentMore actions
+        // GetEntityType
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public static extern IntPtr GetEntityType(IntPtr model, IntPtr geometry);
+
+        // FreeStringAdd
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern void FreeString(IntPtr str);
     }

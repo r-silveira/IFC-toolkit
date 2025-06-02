@@ -52,6 +52,8 @@ extern "C"
     __declspec(dllexport) Vertex* GetVertices(Api* api, Mesh* mesh);
     __declspec(dllexport) int GetNumIndices(Api* api, Mesh* mesh);
     __declspec(dllexport) uint32_t* GetIndices(Api* api, Mesh* mesh);
+	__declspec(dllexport) const char* GetGuid(const Model* model, const ::Geometry* geom);
+	__declspec(dllexport) void FreeString(const char* str);
 }
 
 // Vertex data structure as used by the web-IFC engine
@@ -144,6 +146,29 @@ struct Model
         r->transform = pg.flatTransformation;
         return r;
     }
+
+	const char* GetGuid(const ::Geometry* geom) const
+	{
+		const int geoExpressId = geom->id;
+
+		if (!loader->IsValidExpressID(geoExpressId))
+		{
+			return nullptr;
+		}
+
+		// The GUId is normally the first argument of entities
+		loader->MoveToLineArgument(geoExpressId, 0);
+		const std::string& guid = std::string(loader->GetDecodedStringArgument());
+
+		auto result = (char*)malloc(guid.size() + 1);
+
+		if (result)
+		{
+			std::memcpy(result, guid.c_str(), guid.size() + 1);
+		}
+
+		return result;
+	}
 };
 
 struct Api 
@@ -239,4 +264,14 @@ int GetNumIndices(Api* api, Mesh* mesh) {
 
 uint32_t* GetIndices(Api* api, Mesh* mesh) {
     return mesh->geometry->indexData.data();
+}
+
+const char* GetGuid(const Model* model, const ::Geometry* geom)
+{
+	return model->GetGuid(geom);
+}
+
+void FreeString(const char* str)
+{
+	free((void*)str);
 }

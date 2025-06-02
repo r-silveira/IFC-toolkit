@@ -70,5 +70,13 @@ namespace Ara3D.IfcLoader
         // GetIndices
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr GetIndices(IntPtr api, IntPtr mesh);
+
+        // GetGuid
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public static extern IntPtr GetGuid(IntPtr model, IntPtr geometry);
+
+        // FreeStringAdd commentMore actions
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public static extern void FreeString(IntPtr str);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Ara3D.IfcLoader
+﻿using System.Runtime.InteropServices;
+
+namespace Ara3D.IfcLoader
 {
     public class IfcGeometry
     {
@@ -6,8 +8,23 @@
         public readonly IntPtr GeometryPtr;
         public readonly int NumMeshes;
         public readonly uint Id;
+        public readonly string Guid;
 
-        public IfcGeometry(IntPtr apiPtr, IntPtr geometryPtr)
+        private static string ExtractGuid(IntPtr geometryPtr, IntPtr modelPtr)
+        {
+            if (geometryPtr == IntPtr.Zero)
+            {
+                return string.Empty;
+            }
+                
+            var guidPtr = WebIfcDll.GetGuid(modelPtr, geometryPtr);
+            var guid = Marshal.PtrToStringAnsi(guidPtr) ?? string.Empty;
+            WebIfcDll.FreeString(guidPtr);
+
+            return guid;
+        }
+
+public IfcGeometry(IntPtr apiPtr, IntPtr geometryPtr, IntPtr modelPtr)
         {
             ApiPtr = apiPtr;
             GeometryPtr = geometryPtr;

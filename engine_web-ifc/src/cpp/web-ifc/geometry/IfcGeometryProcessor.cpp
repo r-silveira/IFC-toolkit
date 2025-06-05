@@ -1601,7 +1601,7 @@ namespace webifc::geometry
 
             auto translation = glm::dmat4(1.0);
 
-            translation = geom.Normalize();
+            //translation = geom.Normalize();
 
             _expressIDToGeometry[composedMesh.expressID] = geom;
 

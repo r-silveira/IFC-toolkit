@@ -21,7 +21,6 @@
 
 #include "../engine_web-ifc/src/cpp/web-ifc/modelmanager/ModelManager.h"
 #include "../engine_web-ifc/src/cpp/version.h"
-#include "../engine_web-ifc/src/cpp/web-ifc/geometry/operations/geometryutils.h"
 
 using namespace webifc::manager;
 using namespace webifc::parsing;
@@ -109,80 +108,30 @@ struct Model
     Model(IfcSchemaManager* schemas, IfcLoader* loader, IfcGeometryProcessor* processor, uint32_t modelId)
         : id(modelId), loader(loader), geometryProcessor(processor), schemaManager(schemas)
     {
-
 		for (auto type : schemas->GetIfcElementList())
 		{
+			//// TODO: maybe some of these elments are desired. In fact, I think there may be explicit requests for IFCSPACE?
+			//if (type == IFCOPENINGELEMENT
+			//	|| type == IFCSPACE
+			//	|| type == IFCOPENINGSTANDARDCASE)
+			//{
+			//	continue;
+			//}
+
 			for (auto eId : loader->GetExpressIDsWithType(type))
 			{
-				auto mesh = geometryProcessor->GetMesh(eId);
-				//auto flat = geometryProcessor->GetFlatMesh(eId);
-				
-				auto g = new ::Geometry(eId);
-				
-				ExtractComposedGeoemtry(g, mesh, NormalizeIFC);
-
-				/*
-				auto flatMesh = geometryProcessor->GetFlatMesh(eId);
-
-				for (auto& placedGeom : flatMesh.geometries)
+				const auto& flatMesh = geometryProcessor->GetFlatMesh(eId);
+				const auto& g = new ::Geometry(eId);
+				for (const auto& placedGeom : flatMesh.geometries)
 				{
-					auto mesh = ToMesh(placedGeom, eId, parentMesh);
+					auto mesh = ToMesh(placedGeom);
 					g->meshes.push_back(mesh);
-				}*/
+				}
 				geometries[eId] = g;
 				geometryList.push_back(g);
-				
 			}
-		}  
+		}
     }
-
-	void ExtractComposedGeoemtry(::Geometry* g, const webifc::geometry::IfcComposedMesh& mesh, const glm::dmat4& mat)
-	{
-		glm::dmat4 trans = mat * mesh.transformation;
-
-		//... auto mesh = ToMesh(placedGeom);
-		//if (geom.numFaces != 0)
-		{
-			auto newMesh = ExtractMesh(trans, mesh);
-
-			//if (newMesh->geometry->numPoints != 0)
-			//{
-				g->meshes.push_back(newMesh);
-			//}
-		}
-
-		for (const auto& c : mesh.children)
-		{
-			ExtractComposedGeoemtry(g, c, trans);
-		}
-	}
-
-	std::array<double, 16> FlattenTransformation(const glm::dmat4& transformation) const
-	{
-		std::array<double, 16> flatTransformation;
-
-		for (int i = 0; i < 4; i++)
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				flatTransformation[i * 4 + j] = transformation[i][j];
-			}
-		}
-
-		return flatTransformation;
-	}
-
-	Mesh* ExtractMesh(const glm::dmat4& transform, const webifc::geometry::IfcComposedMesh& mesh)
-	{
-		auto r = new Mesh(mesh.expressID);
-
-		auto newColor = mesh.hasColor ? mesh.color : glm::dvec4(1.0);
-		r->color = Color(newColor.r, newColor.g, newColor.b, newColor.a);
-		r->geometry = &(geometryProcessor->GetGeometry(mesh.expressID));
-		r->transform = FlattenTransformation(transform);
-
-		return r;
-	}
 
     ::Geometry* GetGeometry(uint32_t geoId) const
     {
@@ -210,7 +159,7 @@ struct Model
 			return nullptr;
 		}
 
-		// The GUId is normally the first argument of entities
+		// The GUID is normally the first argument of entities
 		loader->MoveToLineArgument(geoExpressId, 0);
 		const std::string& guid = std::string(loader->GetDecodedStringArgument());
 

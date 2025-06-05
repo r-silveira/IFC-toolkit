@@ -28,8 +28,6 @@
     <Platform>x64</Platform>
     <ProjectName>WebIfcDll</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
-    <TargetFrameworkVersion>
-    </TargetFrameworkVersion>
     <TargetFramework>net7.0</TargetFramework>
     <WindowsTargetPlatformMinVersion>7.0</WindowsTargetPlatformMinVersion>
   </PropertyGroup>

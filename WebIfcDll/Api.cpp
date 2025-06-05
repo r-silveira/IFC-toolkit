@@ -1,4 +1,4 @@
-// Apache 2.0 License
+﻿// Apache 2.0 License
 // Author: Christopher Diggins of Ara 3D Inc for Speckle Systems Ltd.
 // This is a C++ wrapper around the Web-IFC component library by Tom van Diggelen and That Open Company 
 // that is appropriate for use via PInvoke
@@ -16,10 +16,12 @@
 #include <stack>
 #include <cstdint>
 #include <memory>
-#include "../engine_web-ifc/src/cpp/web-ifc/modelmanager/ModelManager.h"
-#include "../engine_web-ifc/src/cpp/version.h"
 #include <iostream>
 #include <fstream>
+
+#include "../engine_web-ifc/src/cpp/web-ifc/modelmanager/ModelManager.h"
+#include "../engine_web-ifc/src/cpp/version.h"
+#include "../engine_web-ifc/src/cpp/web-ifc/geometry/operations/geometryutils.h"
 
 using namespace webifc::manager;
 using namespace webifc::parsing;
@@ -39,19 +41,19 @@ extern "C"
     __declspec(dllexport) Api* InitializeApi();
     __declspec(dllexport) void FinalizeApi(Api* api);
     __declspec(dllexport) Model* LoadModel(Api* api, const char* fileName);
-    __declspec(dllexport) ::Geometry* GetGeometryFromId(Api* api, Model* model, uint32_t id);
-    __declspec(dllexport) int GetNumGeometries(Api* api, Model* model);
-    __declspec(dllexport) ::Geometry* GetGeometryFromIndex(Api* api, Model* model, int32_t index);
-    __declspec(dllexport) int GetNumMeshes(Api* api, ::Geometry* geom);
+    __declspec(dllexport) ::Geometry* GetGeometryFromId(Api* api, const Model* model, uint32_t id);
+    __declspec(dllexport) int GetNumGeometries(Api* api, const Model* model);
+    __declspec(dllexport) ::Geometry* GetGeometryFromIndex(Api* api, const Model* model, int32_t index);
+    __declspec(dllexport) int GetNumMeshes(Api* api, const ::Geometry* geom);
     __declspec(dllexport) uint32_t GetGeometryId(Api* api, ::Geometry* geom);
-    __declspec(dllexport) Mesh* GetMesh(Api* api, ::Geometry* geom, int index);
-    __declspec(dllexport) uint32_t GetMeshId(Api* api, ::Mesh* mesh);
+    __declspec(dllexport) Mesh* GetMesh(Api* api, const ::Geometry* geom, int index);
+    __declspec(dllexport) uint32_t GetMeshId(Api* api, const ::Mesh* mesh);
     __declspec(dllexport) double* GetTransform(Api* api, Mesh* mesh);
     __declspec(dllexport) double* GetColor(Api* api, Mesh* mesh);
-    __declspec(dllexport) int GetNumVertices(Api* api, Mesh* mesh);
-    __declspec(dllexport) Vertex* GetVertices(Api* api, Mesh* mesh);
-    __declspec(dllexport) int GetNumIndices(Api* api, Mesh* mesh);
-    __declspec(dllexport) uint32_t* GetIndices(Api* api, Mesh* mesh);
+    __declspec(dllexport) int GetNumVertices(Api* api, const Mesh* mesh);
+    __declspec(dllexport) Vertex* GetVertices(Api* api, const Mesh* mesh);
+    __declspec(dllexport) int GetNumIndices(Api* api, const Mesh* mesh);
+    __declspec(dllexport) uint32_t* GetIndices(Api* api, const Mesh* mesh);
 	__declspec(dllexport) const char* GetGuid(const Model* model, const ::Geometry* geom);
 	__declspec(dllexport) const char* GetEntityType(const Model* model, const ::Geometry* geom);
 	__declspec(dllexport) void FreeString(const char* str);
@@ -75,22 +77,22 @@ struct Color
 
 struct Mesh 
 {
-    IfcGeometry* geometry;
+    IfcGeometry* geometry = nullptr;
     Color color;
     uint32_t id;
-    std::array<double, 16> transform;
-    Mesh(uint32_t id) 
-        : geometry(nullptr), id(id), transform({}), color() 
+	std::array<double, 16> transform = {};
+    explicit Mesh(uint32_t meshId) 
+        : id(meshId)
     { }
 };
 
 struct Geometry 
 {
     uint32_t id;
-    IfcFlatMesh* flatMesh;
+    IfcFlatMesh* flatMesh = nullptr;
     std::vector<Mesh*> meshes;    
-    Geometry(uint32_t id)
-        : id(id), flatMesh(nullptr) 
+    explicit Geometry(uint32_t geoId)
+        : id(geoId)
     {}
 };
 
@@ -104,51 +106,100 @@ struct Model
     std::vector<::Geometry*> geometryList;
     std::unordered_map<uint32_t, ::Geometry*> geometries;
 
-    Model(IfcSchemaManager* schemas, IfcLoader* loader, IfcGeometryProcessor* processor, uint32_t id)
-        : loader(loader), geometryProcessor(processor), id(id)
+    Model(IfcSchemaManager* schemas, IfcLoader* loader, IfcGeometryProcessor* processor, uint32_t modelId)
+        : id(modelId), loader(loader), geometryProcessor(processor), schemaManager(schemas)
     {
-		schemaManager = schemas;
-        for (auto type : schemas->GetIfcElementList())
-        {
-            // TODO: maybe some of these elments are desired. In fact, I think there may be explicit requests for IFCSPACE?
-            /*if (type == IFCOPENINGELEMENT
-                || type == IFCSPACE
-                || type == IFCOPENINGSTANDARDCASE)
-            {
-                continue;
-            }*/
 
-            for (auto eId : loader->GetExpressIDsWithType(type))
-            {
-                auto flatMesh = geometryProcessor->GetFlatMesh(eId);
-                auto g = new ::Geometry(eId);
-                for (auto& placedGeom : flatMesh.geometries)
-                {
-                    auto mesh = ToMesh(placedGeom);
-                    g->meshes.push_back(mesh);
-                }
-                geometries[eId] = g;
-                geometryList.push_back(g);
-            }
-        }        
+		for (auto type : schemas->GetIfcElementList())
+		{
+			for (auto eId : loader->GetExpressIDsWithType(type))
+			{
+				auto mesh = geometryProcessor->GetMesh(eId);
+				//auto flat = geometryProcessor->GetFlatMesh(eId);
+				
+				auto g = new ::Geometry(eId);
+				
+				ExtractComposedGeoemtry(g, mesh, NormalizeIFC);
+
+				/*
+				auto flatMesh = geometryProcessor->GetFlatMesh(eId);
+
+				for (auto& placedGeom : flatMesh.geometries)
+				{
+					auto mesh = ToMesh(placedGeom, eId, parentMesh);
+					g->meshes.push_back(mesh);
+				}*/
+				geometries[eId] = g;
+				geometryList.push_back(g);
+				
+			}
+		}  
     }
 
-    ::Geometry* GetGeometry(uint32_t id)
+	void ExtractComposedGeoemtry(::Geometry* g, const webifc::geometry::IfcComposedMesh& mesh, const glm::dmat4& mat)
+	{
+		glm::dmat4 trans = mat * mesh.transformation;
+
+		//... auto mesh = ToMesh(placedGeom);
+		//if (geom.numFaces != 0)
+		{
+			auto newMesh = ExtractMesh(trans, mesh);
+
+			//if (newMesh->geometry->numPoints != 0)
+			//{
+				g->meshes.push_back(newMesh);
+			//}
+		}
+
+		for (const auto& c : mesh.children)
+		{
+			ExtractComposedGeoemtry(g, c, trans);
+		}
+	}
+
+	std::array<double, 16> FlattenTransformation(const glm::dmat4& transformation) const
+	{
+		std::array<double, 16> flatTransformation;
+
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				flatTransformation[i * 4 + j] = transformation[i][j];
+			}
+		}
+
+		return flatTransformation;
+	}
+
+	Mesh* ExtractMesh(const glm::dmat4& transform, const webifc::geometry::IfcComposedMesh& mesh)
+	{
+		auto r = new Mesh(mesh.expressID);
+
+		auto newColor = mesh.hasColor ? mesh.color : glm::dvec4(1.0);
+		r->color = Color(newColor.r, newColor.g, newColor.b, newColor.a);
+		r->geometry = &(geometryProcessor->GetGeometry(mesh.expressID));
+		r->transform = FlattenTransformation(transform);
+
+		return r;
+	}
+
+    ::Geometry* GetGeometry(uint32_t geoId) const
     {
-        auto it = geometries.find(id);
+        auto it = geometries.find(geoId);
         if (it == geometries.end())
             return nullptr;
         return it->second;
     }
 
-    Mesh* ToMesh(IfcPlacedGeometry& pg) 
-    {
-        auto r = new Mesh(pg.geometryExpressID);
-        r->color = Color(pg.color.r, pg.color.g, pg.color.b, pg.color.a);
-        r->geometry = &(geometryProcessor->GetGeometry(pg.geometryExpressID));
-        r->transform = pg.flatTransformation;
-        return r;
-    }
+	Mesh* ToMesh(const IfcPlacedGeometry& pg) const
+	{
+		auto r = new Mesh(pg.geometryExpressID);
+		r->color = Color(pg.color.r, pg.color.g, pg.color.b, pg.color.a);
+		r->geometry = &(geometryProcessor->GetGeometry(pg.geometryExpressID));
+		r->transform = pg.flatTransformation;
+		return r;
+	}
 
 	const char* GetGuid(const ::Geometry* geom) const
 	{
@@ -202,16 +253,13 @@ struct Model
 
 struct Api 
 {
-    ModelManager* manager;
-    IfcSchemaManager* schemaManager;
-    LoaderSettings* settings;
+    ModelManager* manager = new ModelManager(false);
+    IfcSchemaManager* schemaManager = new IfcSchemaManager();
+    LoaderSettings* settings = new webifc::manager::LoaderSettings();
 
     Api() 
     {
-        schemaManager = new IfcSchemaManager();
-        manager = new ModelManager(false);
         manager->SetLogLevel(6); // Turns off logging
-        settings = new webifc::manager::LoaderSettings();
     }   
 
     Model* LoadModel(const char* fileName)
@@ -251,47 +299,47 @@ double* GetColor(Api* api, Mesh* mesh) {
     return &mesh->color.R;
 }
 
-::Geometry* GetGeometryFromId(Api* api, Model* model, uint32_t id) {
+::Geometry* GetGeometryFromId(Api* api, const Model* model, uint32_t id) {
     return model->GetGeometry(id);
 }
 
-int GetNumGeometries(Api* api, Model* model) {
+int GetNumGeometries(Api* api, const Model* model) {
     return model->geometries.size();
 }
 
-::Geometry* GetGeometryFromIndex(Api* api, Model* model, int32_t index) {
+::Geometry* GetGeometryFromIndex(Api* api, const Model* model, int32_t index) {
     return model->geometryList[index];
 }
 
-uint32_t GetGeometryId(Api* api, ::Geometry* geom) {
+uint32_t GetGeometryId(Api* api, const ::Geometry* geom) {
     return geom->id;
 }
 
-int GetNumMeshes(Api* api, ::Geometry* geom) {
+int GetNumMeshes(Api* api, const ::Geometry* geom) {
     return geom->meshes.size();
 }
 
-Mesh* GetMesh(Api* api, ::Geometry* geom, int index) {
+Mesh* GetMesh(Api* api, const ::Geometry* geom, int index) {
     return geom->meshes[index];
 }
 
-uint32_t GetMeshId(Api* api, ::Mesh* mesh) {
+uint32_t GetMeshId(Api* api, const ::Mesh* mesh) {
     return mesh->id;
 }
 
-int GetNumVertices(Api* api, Mesh* mesh) {
+int GetNumVertices(Api* api, const Mesh* mesh) {
     return mesh->geometry->vertexData.size() / 6;
 }
 
-Vertex* GetVertices(Api* api, Mesh* mesh) {
+Vertex* GetVertices(Api* api, const Mesh* mesh) {
     return reinterpret_cast<Vertex*>(mesh->geometry->vertexData.data());
 }
 
-int GetNumIndices(Api* api, Mesh* mesh) {
+int GetNumIndices(Api* api, const Mesh* mesh) {
     return mesh->geometry->indexData.size();
 }
 
-uint32_t* GetIndices(Api* api, Mesh* mesh) {
+uint32_t* GetIndices(Api* api, const Mesh* mesh) {
     return mesh->geometry->indexData.data();
 }
 

@@ -13,14 +13,11 @@
 #include <string>
 #include <algorithm>
 #include <vector>
-#include <stack>
 #include <cstdint>
 #include <memory>
-#include <iostream>
 #include <fstream>
 
 #include "../engine_web-ifc/src/cpp/web-ifc/modelmanager/ModelManager.h"
-#include "../engine_web-ifc/src/cpp/version.h"
 
 using namespace webifc::manager;
 using namespace webifc::parsing;
@@ -55,6 +52,8 @@ extern "C"
     __declspec(dllexport) uint32_t* GetIndices(Api* api, const Mesh* mesh);
 	__declspec(dllexport) const char* GetGuid(const Model* model, const ::Geometry* geom);
 	__declspec(dllexport) const char* GetEntityType(const Model* model, const ::Geometry* geom);
+	__declspec(dllexport) uint32_t GetEntityTypeId(const Model* model, const ::Geometry* geom);
+	__declspec(dllexport) uint32_t GetEntityLabel(const Model* model, const ::Geometry* geom);
 	__declspec(dllexport) void FreeString(const char* str);
 }
 
@@ -152,7 +151,7 @@ struct Model
 
 	const char* GetGuid(const ::Geometry* geom) const
 	{
-		const int geoExpressId = geom->id;
+		const uint32_t& geoExpressId = geom->id;
 
 		if (!loader->IsValidExpressID(geoExpressId))
 		{
@@ -180,9 +179,9 @@ struct Model
 			return nullptr;
 		}
 
-		const int geoExpressId = geom->id;
+		const uint32_t& geoExpressId = geom->id;
+		const uint32_t& lineType = loader->GetLineType(geoExpressId);
 
-		uint32_t lineType = loader->GetLineType(geoExpressId);
 		if (lineType == 0)
 		{
 			return nullptr;
@@ -197,6 +196,51 @@ struct Model
 		}
 
 		return result;
+	}
+
+	uint32_t GetEntityLabel(const ::Geometry* geom) const
+	{
+		if (schemaManager == nullptr)
+		{
+			return 0;
+		}
+
+		const uint32_t& geoExpressId = geom->id;
+
+		if (!loader->IsValidExpressID(geoExpressId))
+		{
+			return 0;
+		}
+
+		const uint32_t& lineType = loader->GetLineType(geoExpressId);
+		const auto& expressIds = loader->GetExpressIDsWithType(lineType);
+
+		if (expressIds.empty())
+		{
+			return 0;
+		}
+
+		return expressIds[0];
+
+		//auto lineId = loader->GetExpressIDsWithType(lineType)[0];
+		//auto lineId = loader->GetExpressIDsWithType(lineType)[0];
+	}
+
+	uint32_t GetEntityTypeId(const ::Geometry* geom) const
+	{
+		if (schemaManager == nullptr)
+		{
+			return 0;
+		}
+
+		const uint32_t& geoExpressId = geom->id;
+
+		if (!loader->IsValidExpressID(geoExpressId))
+		{
+			return 0;
+		}
+
+		return loader->GetLineType(geoExpressId);
 	}
 };
 
@@ -300,6 +344,16 @@ const char* GetGuid(const Model* model, const ::Geometry* geom)
 const char* GetEntityType(const Model* model, const ::Geometry* geom)
 {
 	return model->GetEntityType(geom);
+}
+
+uint32_t GetEntityTypeId(const Model* model, const ::Geometry* geom)
+{
+	return model->GetEntityTypeId(geom);
+}
+
+uint32_t GetEntityLabel(const Model* model, const ::Geometry* geom)
+{
+	return model->GetEntityLabel(geom);
 }
 
 void FreeString(const char* str)

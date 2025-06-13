@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ara3D.SDK" Version="1.2.0" />
     <PackageReference Include="GeometryGymIFC_Core" Version="24.5.8" />
     <PackageReference Include="Hypar.IFC2X3" Version="0.1.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
@@ -29,24 +30,7 @@
     <ProjectReference Include="..\Ara3D.Speckle.Data\Ara3D.Speckle.Data.csproj" />
     <ProjectReference Include="..\Ara3D.Speckle.IfcLoader\Ara3D.Speckle.IfcLoader.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Ara3D.IO.IfcParser">
-      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.IO.IfcParser.dll</HintPath>
-    </Reference>
-    <Reference Include="Ara3D.IO.StepParser">
-      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.IO.StepParser.dll</HintPath>
-    </Reference>
-    <Reference Include="Ara3D.Logging">
-      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Ara3D.Memory">
-      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="Ara3D.Utils">
-      <HintPath>..\..\Libs\ara3d-sdk\Ara3D.Utils.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    
 
   <ItemGroup>
     <None Update="web-ifc-dll.dll">

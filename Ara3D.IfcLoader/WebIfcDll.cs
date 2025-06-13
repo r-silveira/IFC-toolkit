@@ -79,6 +79,14 @@ namespace Ara3D.IfcLoader
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern IntPtr GetEntityType(IntPtr model, IntPtr geometry);
 
+        // GetEntityTypeId
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public static extern uint GetEntityTypeId(IntPtr model, IntPtr geometry);
+
+        // GetEntityLabel
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public static extern uint GetEntityLabel(IntPtr model, IntPtr geometry);
+
         // FreeStringAdd
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern void FreeString(IntPtr str);

@@ -1,5 +1,4 @@
-﻿using Ara3D.Logging;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Ara3D.IfcLoader
 {
@@ -23,7 +22,7 @@ namespace Ara3D.IfcLoader
             Guid = ExtractGuid(geometryPtr, modelPtr);
             EntityType = ExtractEntityType(geometryPtr, modelPtr);
             EntityTypeId = ExtractEntityTypeId(geometryPtr, modelPtr);
-            EntityLabel = ExtractEntityLabel(geometryPtr, modelPtr);
+            EntityLabel = WebIfcDll.GetGeometryId(ApiPtr, GeometryPtr);
         }
 
         private static string ExtractGuid(IntPtr geometryPtr, IntPtr modelPtr)
@@ -62,42 +61,6 @@ namespace Ara3D.IfcLoader
             }
 
             return WebIfcDll.GetEntityTypeId(modelPtr, geometryPtr);
-        }
-
-        private static uint ExtractEntityLabel(IntPtr geometryPtr, IntPtr modelPtr)
-        {
-            if (geometryPtr == IntPtr.Zero)
-            {
-                return 0;
-            }
-            
-            return WebIfcDll.GetEntityLabel(modelPtr, geometryPtr);
-
-            //var id = WebIfcDll.GetEntityLabel(modelPtr, geometryPtr);
-
-            //var entityTypePtr = WebIfcDll.GetEntityType(modelPtr, geometryPtr);
-            //var entityType = Marshal.PtrToStringAnsi(entityTypePtr) ?? string.Empty;
-
-            //if (entityType == "IfcFooting")
-            //{
-            //    var stop = true;
-            //}
-
-            //if (id == 23286)
-            //{
-            //    var pause = true;
-            //}
-
-            //if (id == 23369)
-            //{
-            //    var pause = true;
-            //}
-
-            //if (id == 23408)
-            //{
-            //    var pause = true;
-            //}
-            //return id;
         }
 
         public IfcMesh GetMesh(int i) 

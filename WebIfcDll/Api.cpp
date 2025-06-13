@@ -41,7 +41,7 @@ extern "C"
     __declspec(dllexport) int GetNumGeometries(Api* api, const Model* model);
     __declspec(dllexport) ::Geometry* GetGeometryFromIndex(Api* api, const Model* model, int32_t index);
     __declspec(dllexport) int GetNumMeshes(Api* api, const ::Geometry* geom);
-    __declspec(dllexport) uint32_t GetGeometryId(Api* api, ::Geometry* geom);
+    __declspec(dllexport) uint32_t GetGeometryId(Api* api, const ::Geometry* geom);
     __declspec(dllexport) Mesh* GetMesh(Api* api, const ::Geometry* geom, int index);
     __declspec(dllexport) uint32_t GetMeshId(Api* api, const ::Mesh* mesh);
     __declspec(dllexport) double* GetTransform(Api* api, Mesh* mesh);
@@ -53,7 +53,6 @@ extern "C"
 	__declspec(dllexport) const char* GetGuid(const Model* model, const ::Geometry* geom);
 	__declspec(dllexport) const char* GetEntityType(const Model* model, const ::Geometry* geom);
 	__declspec(dllexport) uint32_t GetEntityTypeId(const Model* model, const ::Geometry* geom);
-	__declspec(dllexport) uint32_t GetEntityLabel(const Model* model, const ::Geometry* geom);
 	__declspec(dllexport) void FreeString(const char* str);
 }
 
@@ -198,34 +197,6 @@ struct Model
 		return result;
 	}
 
-	uint32_t GetEntityLabel(const ::Geometry* geom) const
-	{
-		if (schemaManager == nullptr)
-		{
-			return 0;
-		}
-
-		const uint32_t& geoExpressId = geom->id;
-
-		if (!loader->IsValidExpressID(geoExpressId))
-		{
-			return 0;
-		}
-
-		const uint32_t& lineType = loader->GetLineType(geoExpressId);
-		const auto& expressIds = loader->GetExpressIDsWithType(lineType);
-
-		if (expressIds.empty())
-		{
-			return 0;
-		}
-
-		return expressIds[0];
-
-		//auto lineId = loader->GetExpressIDsWithType(lineType)[0];
-		//auto lineId = loader->GetExpressIDsWithType(lineType)[0];
-	}
-
 	uint32_t GetEntityTypeId(const ::Geometry* geom) const
 	{
 		if (schemaManager == nullptr)
@@ -349,11 +320,6 @@ const char* GetEntityType(const Model* model, const ::Geometry* geom)
 uint32_t GetEntityTypeId(const Model* model, const ::Geometry* geom)
 {
 	return model->GetEntityTypeId(geom);
-}
-
-uint32_t GetEntityLabel(const Model* model, const ::Geometry* geom)
-{
-	return model->GetEntityLabel(geom);
 }
 
 void FreeString(const char* str)
